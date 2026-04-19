@@ -10,7 +10,7 @@ variables:
 before_script:
   - docker info
 
-# 🔨 BUILD
+#  BUILD
 build_job:
   stage: build
   script:
@@ -18,7 +18,7 @@ build_job:
   tags:
     - dev
 
-# 🧪 TEST
+#  TEST
 test_job:
   stage: test
   script:
@@ -27,7 +27,7 @@ test_job:
   tags:
     - dev
 
-# 📦 PUSH TO DOCKER HUB
+# PUSH TO DOCKER HUB
 push_job:
   stage: push_to_dockerhub
   script:
@@ -36,7 +36,7 @@ push_job:
   tags:
     - dev
 
-# 🚀 DEPLOY
+# DEPLOY
 deploy_job:
   stage: deploy
   script:
