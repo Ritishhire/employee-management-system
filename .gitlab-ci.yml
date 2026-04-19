@@ -1,0 +1,46 @@
+stages:
+  - build
+  - test
+  - push_to_dockerhub
+  - deploy
+
+variables:
+  IMAGE_NAME: $DOCKERHUB_USER/node-app
+
+before_script:
+  - docker info
+
+# 🔨 BUILD
+build_job:
+  stage: build
+  script:
+    - docker build -t $IMAGE_NAME:latest .
+  tags:
+    - dev
+
+# 🧪 TEST
+test_job:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - docker run --rm $IMAGE_NAME:latest node -e "console.log('App is running')"
+  tags:
+    - dev
+
+# 📦 PUSH TO DOCKER HUB
+push_job:
+  stage: push_to_dockerhub
+  script:
+    - echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+    - docker push $IMAGE_NAME:latest
+  tags:
+    - dev
+
+# 🚀 DEPLOY
+deploy_job:
+  stage: deploy
+  script:
+    - docker-compose down || true
+    - docker-compose up -d --build
+  tags:
+    - dev
