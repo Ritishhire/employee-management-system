@@ -1,46 +1,47 @@
 stages:
   - build
   - test
-  - push_to_dockerhub
+  - push
   - deploy
 
 variables:
-  IMAGE_NAME: $DOCKERHUB_USER/node-app
+  BACKEND_IMAGE: $DOCKERHUB_USER/ems-backend
+  FRONTEND_IMAGE: $DOCKERHUB_USER/ems-frontend
 
-before_script:
-  - docker info
-
-#  BUILD
+# 🔨 BUILD
 build_job:
   stage: build
   script:
-    - docker build -t $IMAGE_NAME:latest .
+    - docker build -t $BACKEND_IMAGE:latest ./EMS-Project-Backend
+    - docker build -t $FRONTEND_IMAGE:latest ./EMS-Project-Frontend
   tags:
     - dev
 
-#  TEST
+# 🧪 TEST
 test_job:
   stage: test
   script:
-    - echo "Running tests..."
-    - docker run --rm $IMAGE_NAME:latest node -e "console.log('App is running')"
+    - docker run --rm $BACKEND_IMAGE:latest node -e "console.log('Backend OK')"
+    - docker run --rm $FRONTEND_IMAGE:latest sh -c "echo Frontend OK"
   tags:
     - dev
 
-# PUSH TO DOCKER HUB
+# 📦 PUSH
 push_job:
-  stage: push_to_dockerhub
+  stage: push
   script:
     - echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
-    - docker push $IMAGE_NAME:latest
+    - docker push $BACKEND_IMAGE:latest
+    - docker push $FRONTEND_IMAGE:latest
   tags:
     - dev
 
-# DEPLOY
+# 🚀 DEPLOY
 deploy_job:
   stage: deploy
   script:
     - docker-compose down || true
-    - docker-compose up -d --build
+    - docker-compose pull
+    - docker-compose up -d
   tags:
     - dev

@@ -1,29 +1,28 @@
-version: "3.8"
-
 services:
   frontend:
-    build: ./EMS-Project-Frontend
+    image: ritishhire/ems-frontend:latest
     ports:
       - "3000:80"
     depends_on:
       - backend
+    restart: always
 
   backend:
-    build: ./EMS-Project-Backend
+    image: ritishhire/ems-backend:latest
     ports:
-      - "5000:5000"
+      - "6000:6000"
     environment:
-      - MONGO_URI=mongodb://mongo:27017/erpppppp
-      - JWT_SECRET=ritish_secret
+      MONGO_URI: mongodb://mongo:27017/erpppppp
+      JWT_SECRET: ritish_secret
     depends_on:
       - mongo
+    restart: always
 
   mongo:
     image: mongo:6
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    restart: always
 
 volumes:
   mongo_data:
